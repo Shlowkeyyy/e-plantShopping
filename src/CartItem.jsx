@@ -1,44 +1,80 @@
 import { useSelector, useDispatch } from "react-redux";
 
 import {
-  increaseQuantity,
-  decreaseQuantity,
+  updateQuantity,
   removeItem,
 } from "./CartSlice";
 
 import "./cartitem.css";
 
-function CartItem({ onHomeClick, onContinueShopping }) {
+function CartItem({
+  onHomeClick,
+  onContinueShopping,
+}) {
   const dispatch = useDispatch();
 
-  const cartItems = useSelector((state) => state.cart.items);
+  const cartItems = useSelector(
+    (state) => state.cart.items
+  );
 
   const totalAmount = cartItems.reduce(
-    (total, item) => total + item.cost * item.quantity,
+    (total, item) =>
+      total + item.cost * item.quantity,
     0
   );
 
   const totalItems = cartItems.reduce(
-    (total, item) => total + item.quantity,
+    (total, item) =>
+      total + item.quantity,
     0
   );
 
+  const handleIncrement = (item) => {
+    dispatch(
+      updateQuantity({
+        name: item.name,
+        quantity: item.quantity + 1,
+      })
+    );
+  };
+
+  const handleDecrement = (item) => {
+    dispatch(
+      updateQuantity({
+        name: item.name,
+        quantity: item.quantity - 1,
+      })
+    );
+  };
+
+  const handleRemove = (item) => {
+    dispatch(removeItem(item.name));
+  };
+
   return (
     <div className="cart-page">
-      <nav className="cart-navbar">
-        <div className="cart-logo" onClick={onHomeClick}>
+      <nav className="navbar cart-navbar">
+        <div
+          className="logo cart-logo"
+          onClick={onHomeClick}
+        >
           🌿 Paradise Nursery
         </div>
 
-        <div className="cart-nav-links">
-          <button onClick={onHomeClick}>Home</button>
+        <div className="nav-links">
+          <button onClick={onHomeClick}>
+            Home
+          </button>
 
           <button onClick={onContinueShopping}>
             Plants
           </button>
 
-          <button className="cart-active">
-            🛒 Cart {totalItems}
+          <button className="cart-button">
+            🛒 Cart{" "}
+            <span className="cart_quantity_count">
+              {totalItems}
+            </span>
           </button>
         </div>
       </nav>
@@ -60,13 +96,15 @@ function CartItem({ onHomeClick, onContinueShopping }) {
 
         {cartItems.length === 0 ? (
           <div className="empty-cart">
-            <div className="empty-icon">🌱</div>
+            <div className="empty-icon">
+              🌱
+            </div>
 
             <h2>Your cart is empty</h2>
 
             <p>
-              Discover some beautiful plants and bring a
-              little more green into your space.
+              Discover some beautiful plants and bring
+              a little more green into your space.
             </p>
 
             <button
@@ -80,17 +118,18 @@ function CartItem({ onHomeClick, onContinueShopping }) {
           <div className="cart-layout">
             <section className="cart-items">
               {cartItems.map((item) => {
-                const itemTotal = item.cost * item.quantity;
+                const itemTotal =
+                  item.cost * item.quantity;
 
                 return (
                   <article
                     className="cart-card"
-                    key={item.id}
+                    key={item.name}
                   >
                     <img
                       src={item.image}
                       alt={item.name}
-                      className="cart-image"
+                      className="cart-item-image"
                     />
 
                     <div className="cart-item-info">
@@ -104,21 +143,19 @@ function CartItem({ onHomeClick, onContinueShopping }) {
                       <div className="quantity-controls">
                         <button
                           onClick={() =>
-                            dispatch(
-                              decreaseQuantity(item.id)
-                            )
+                            handleDecrement(item)
                           }
                         >
                           −
                         </button>
 
-                        <span>{item.quantity}</span>
+                        <span>
+                          {item.quantity}
+                        </span>
 
                         <button
                           onClick={() =>
-                            dispatch(
-                              increaseQuantity(item.id)
-                            )
+                            handleIncrement(item)
                           }
                         >
                           +
@@ -132,11 +169,9 @@ function CartItem({ onHomeClick, onContinueShopping }) {
                       </strong>
 
                       <button
-                        className="delete-button"
+                        className="cart-item-delete"
                         onClick={() =>
-                          dispatch(
-                            removeItem(item.id)
-                          )
+                          handleRemove(item)
                         }
                       >
                         Delete

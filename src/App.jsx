@@ -1,16 +1,18 @@
 import { useState } from "react";
 import { useSelector } from "react-redux";
-import "./App.css";
 
+import "./App.css";
 import AboutUs from "./AboutUs";
 import ProductList from "./ProductList";
 import CartItem from "./CartItem";
 
 function App() {
-  const [page, setPage] = useState("home");
+  const [showProductList, setShowProductList] = useState(false);
+  const [showCart, setShowCart] = useState(false);
+  const [showAbout, setShowAbout] = useState(false);
 
   const cartItems = useSelector(
-    (state) => state.cart?.items || []
+    (state) => state.cart.items
   );
 
   const totalItems = cartItems.reduce(
@@ -18,125 +20,120 @@ function App() {
     0
   );
 
+  const handleGetStartedClick = () => {
+    setShowProductList(true);
+    setShowCart(false);
+    setShowAbout(false);
+  };
+
+  const handleHomeClick = () => {
+    setShowProductList(false);
+    setShowCart(false);
+    setShowAbout(false);
+  };
+
+  const handlePlantsClick = () => {
+    setShowProductList(true);
+    setShowCart(false);
+    setShowAbout(false);
+  };
+
+  const handleCartClick = () => {
+    setShowCart(true);
+    setShowProductList(false);
+    setShowAbout(false);
+  };
+
+  const handleAboutClick = () => {
+    setShowAbout(true);
+    setShowProductList(false);
+    setShowCart(false);
+  };
+
+  if (showProductList) {
+    return (
+      <ProductList
+        onHomeClick={handleHomeClick}
+        onPlantsClick={handlePlantsClick}
+        onCartClick={handleCartClick}
+      />
+    );
+  }
+
+  if (showCart) {
+    return (
+      <CartItem
+        onHomeClick={handleHomeClick}
+        onContinueShopping={handlePlantsClick}
+      />
+    );
+  }
+
   return (
     <div className="app">
+      <nav className="navbar">
+        <div
+          className="logo"
+          onClick={handleHomeClick}
+        >
+          🌿 Paradise Nursery
+        </div>
 
-      {/* HOME PAGE */}
+        <div className="nav-links">
+          <button onClick={handleHomeClick}>
+            Home
+          </button>
 
-      {page === "home" && (
-        <>
-          <nav className="navbar">
-            <div
-              className="logo"
-              onClick={() => setPage("home")}
-            >
-              🌿 Paradise Nursery
-            </div>
+          <button onClick={handleAboutClick}>
+            About Us
+          </button>
 
-            <div className="nav-links">
-              <button onClick={() => setPage("home")}>
-                Home
-              </button>
+          <button onClick={handlePlantsClick}>
+            Plants
+          </button>
 
-              <button onClick={() => setPage("about")}>
-                About Us
-              </button>
+          <button
+            className="cart-button"
+            onClick={handleCartClick}
+          >
+            🛒 Cart{" "}
+            <span className="cart_quantity_count">
+              {totalItems}
+            </span>
+          </button>
+        </div>
+      </nav>
 
-              <button onClick={() => setPage("plants")}>
-                Plants
-              </button>
-
-              <button
-                className="cart-button"
-                onClick={() => setPage("cart")}
-              >
-                🛒 Cart <span>{totalItems}</span>
-              </button>
-            </div>
-          </nav>
-
-          <main className="hero">
+      {showAbout ? (
+        <AboutUs />
+      ) : (
+        <main className="background-image">
+          <div className="hero">
             <div className="hero-overlay">
-
               <p className="eyebrow">
                 BRING NATURE HOME
               </p>
 
-              <h1>Paradise Nursery</h1>
+              <h1>
+                Welcome to Paradise Nursery
+              </h1>
 
               <p className="hero-text">
-                Discover beautiful indoor plants that transform
-                your space into a peaceful, refreshing paradise.
+                Discover beautiful indoor plants that
+                transform your space into a peaceful,
+                refreshing paradise.
               </p>
 
               <button
                 className="get-started"
-                onClick={() => setPage("plants")}
+                onClick={handleGetStartedClick}
               >
-                Get Started →
-              </button>
-
-            </div>
-          </main>
-        </>
-      )}
-
-      {/* ABOUT PAGE */}
-
-      {page === "about" && (
-        <>
-          <nav className="navbar">
-            <div
-              className="logo"
-              onClick={() => setPage("home")}
-            >
-              🌿 Paradise Nursery
-            </div>
-
-            <div className="nav-links">
-              <button onClick={() => setPage("home")}>
-                Home
-              </button>
-
-              <button onClick={() => setPage("about")}>
-                About Us
-              </button>
-
-              <button onClick={() => setPage("plants")}>
-                Plants
-              </button>
-
-              <button
-                className="cart-button"
-                onClick={() => setPage("cart")}
-              >
-                🛒 Cart <span>{totalItems}</span>
+                Get Started
               </button>
             </div>
-          </nav>
-
-          <AboutUs />
-        </>
+          </div>
+        </main>
       )}
-
-      {/* PLANTS PAGE */}
-
-      {page === "plants" && (
-        <ProductList
-          onHomeClick={() => setPage("home")}
-          onCartClick={() => setPage("cart")}
-        />
-      )}
-
-      {/* CART PAGE */}
-
-      {page === "cart" && (
-        <CartItem
-          onHomeClick={() => setPage("home")}
-          onContinueShopping={() => setPage("plants")}
-        />
-      )}
-
     </div>
   );
 }
